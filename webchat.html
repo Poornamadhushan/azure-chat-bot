@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Azure Chat Bot</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+        #userInput { width: 80%; }
+        #sendBtn { width: 15%; }
+    </style>
+</head>
+<body>
+    <h2>Azure Chat Bot</h2>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off" />
+    <button id="sendBtn">Send</button>
+    <script>
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function appendMessage(sender, text) {
+            const div = document.createElement('div');
+            div.textContent = sender + ": " + text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            appendMessage("You", message);
+            userInput.value = "";
+            try {
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await res.json();
+                appendMessage("Bot", data.response);
+            } catch (err) {
+                appendMessage("Bot", "Error: Could not reach server.");
+            }
+        }
+
+        sendBtn.onclick = sendMessage;
+        userInput.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>

@@ -1,64 +1,37 @@
-
 import os
-import base64
 from openai import AzureOpenAI
 
+# Environment variables or defaults
 endpoint = os.getenv("ENDPOINT_URL", "https://devnoxbot.openai.azure.com/")
 deployment = os.getenv("DEPLOYMENT_NAME", "devnoxbot")
-subscription_key = os.getenv("AZURE_OPENAI_API_KEY", "REPLACE_WITH_YOUR_KEY_VALUE_HERE")
+subscription_key = os.getenv("AZURE_OPENAI_API_KEY", "api_key_placeholder")
 
-# Initialize Azure OpenAI client with key-based authentication
+# Initialize Azure OpenAI client
 client = AzureOpenAI(
     azure_endpoint=endpoint,
     api_key=subscription_key,
     api_version="2025-01-01-preview",
 )
 
-# IMAGE_PATH = "YOUR_IMAGE_PATH"
-# encoded_image = base64.b64encode(open(IMAGE_PATH, 'rb').read()).decode('ascii')
-
-# Prepare the chat prompt
-chat_prompt = [
+# Chat prompt
+messages = [
     {
         "role": "system",
-        "content": [
-            {
-                "type": "text",
-                "text": "You are an AI assistant that helps people find information."
-            }
-        ]
+        "content": "You are an AI assistant that helps people find information."
     },
     {
         "role": "user",
-        "content": [
-            {
-                "type": "text",
-                "text": "I am going to Paris, what should I see?"
-            }
-        ]
+        "content": "I am going to Paris, what should I see?"
     },
     {
         "role": "assistant",
-        "content": [
-            {
-                "type": "text",
-                "text": "Paris, the capital of France, is known for its stunning architecture, art museums, historical landmarks, and romantic atmosphere. Here are some of the top attractions to see in Paris:\n\n1. The Eiffel Tower: The iconic Eiffel Tower is one of the most recognizable landmarks in the world and offers breathtaking views of the city.\n2. The Louvre Museum: The Louvre is one of the world's largest and most famous museums, housing an impressive collection of art and artifacts, including the Mona Lisa.\n3. Notre-Dame Cathedral: This beautiful cathedral is one of the most famous landmarks in Paris and is known for its Gothic architecture and stunning stained glass windows.\n\nThese are just a few of the many attractions that Paris has to offer. With so much to see and do, it's no wonder that Paris is one of the most popular tourist destinations in the world."
-            }
-        ]
+        "content": "Paris, the capital of France, is known for its stunning architecture, art museums, historical landmarks, and romantic atmosphere. Here are some top attractions:\n\n1. Eiffel Tower\n2. Louvre Museum\n3. Notre-Dame Cathedral"
     },
     {
         "role": "user",
-        "content": [
-            {
-                "type": "text",
-                "text": "What is so great about #1?"
-            }
-        ]
+        "content": "What is so great about #1?"
     }
 ]
-
-# Include speech result if speech is enabled
-messages = chat_prompt
 
 # Generate the completion
 completion = client.chat.completions.create(
@@ -69,9 +42,9 @@ completion = client.chat.completions.create(
     top_p=0.95,
     frequency_penalty=0,
     presence_penalty=0,
-    stop=None,
     stream=False
 )
 
-print(completion.to_json())
-    
+# Print full response
+print("\nAssistant Response:\n")
+print(completion.choices[0].message.content)
